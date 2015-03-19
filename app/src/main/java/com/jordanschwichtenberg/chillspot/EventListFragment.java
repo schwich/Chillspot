@@ -1,5 +1,6 @@
 package com.jordanschwichtenberg.chillspot;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -56,6 +58,21 @@ public class EventListFragment extends Fragment {
 
         ListView listView = (ListView) rootView.findViewById(R.id.listview_eventlist);
         listView.setAdapter(mEventListAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String eventIDStr = mEventListAdapter.getItem(position);
+                String eventID = eventIDStr.split(" ")[1];
+                eventID = eventID.split("\n")[0];
+                eventID = eventID.replaceAll("\\s+","");
+
+                Log.v("HELLO", "EVENT ID SENT TO FRAGMENT: " + eventID);
+
+                Intent intent = new Intent(getActivity(), EventDetailActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT, eventID);
+                startActivity(intent);
+            }
+        });
 
         // kick off async task
         FetchEventsListTask eventTask = new FetchEventsListTask();
@@ -101,12 +118,14 @@ public class EventListFragment extends Fragment {
                 String address;
                 String latitude;
                 String longitude;
+                String id;
 
                 JSONObject eventObject = eventsList.getJSONObject(i);
+                id = eventObject.getString(CHILLSPOT_EVENT_ID);
                 address = eventObject.getString(CHILLSPOT_EVENT_ADDRESS);
                 latitude = eventObject.getString(CHILLSPOT_EVENT_LATITUDE);
                 longitude = eventObject.getString(CHILLSPOT_EVENT_LONGITUDE);
-                resultStrs[i] = address + "\nlatitude:\t" + latitude + "\nlongitude:\t" + longitude;
+                resultStrs[i] = "ID: " + id + "\nAddress: " + address;
             }
 
             return resultStrs;
@@ -157,6 +176,7 @@ public class EventListFragment extends Fragment {
 
             } catch (IOException e) {
                 Log.e(LOG_TAG, "ERROR: ", e);
+                Log.e(LOG_TAG, urlConnection.getErrorStream().toString());
                 return null;
             } finally {
                 if (urlConnection != null) {
