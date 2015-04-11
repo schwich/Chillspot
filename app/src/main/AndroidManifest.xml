@@ -26,6 +26,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.jordanschwichtenberg.chillspot.MainActivity" />
         </activity>
+
+        <provider
+            android:authorities="com.jordanschwichtenberg.chillspot"
+            android:name=".data.EventProvider"
+            android:exported="false" />
     </application>
 
 </manifest>
