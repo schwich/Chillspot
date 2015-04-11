@@ -15,6 +15,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.jordanschwichtenberg.chillspot.sync.ChillspotSyncAdapter;
+
 
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
 
@@ -48,6 +50,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                                     .setText(mAppSectionsPagerAdapter.getPageTitle(i))
                                     .setTabListener(this));
         }
+
+        ChillspotSyncAdapter.syncImmediately(this);
     }
 
 
