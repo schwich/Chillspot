@@ -28,24 +28,14 @@ public class EventContract {
         // content://com.jordanschwichtenberg.chillspot/events
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_EVENTS).build();
-
-        public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_EVENTS;
-
-        public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_EVENTS;
-
-        public static Uri buildEventUri(long id) {
-            return ContentUris.withAppendedId(CONTENT_URI, id);
-        }
-
         /**
          * Define the events table columns
          */
 
-        public static final String TABLE_NAME = "events";
-
-        public static final String COLUMN_EVENT_ID = "event_id";
+        public static final String TABLE_NAME = "events";        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_EVENTS;
+        public static final String COLUMN_EVENT_ID = "event_id";        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_EVENTS;
         public static final String COLUMN_ADDRESS = "address";
         public static final String COLUMN_LATITUDE = "latitude";
         public static final String COLUMN_LONGITUDE = "longitude";
@@ -55,6 +45,12 @@ public class EventContract {
         public static final String COLUMN_SUB_CATEGORY = "sub_category";
         public static final String COLUMN_NOTE = "note";
         public static final String COLUMN_ATTENDING_COUNT = "attending_count";
+
+        public static Uri buildEventUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+
     }
 
     /**
@@ -65,26 +61,22 @@ public class EventContract {
         // content://com.jordanschwichtenberg.chillspot/user
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_USER).build();
+        /**
+         * Define the user table columns
+         */
 
-        public static final String CONTENT_TYPE =
+        public static final String TABLE_NAME = "user";        public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_USER;
-
-        public static final String CONTENT_ITEM_TYPE =
+        public static final String COLUMN_USER_ID = "user_id";        public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_USER;
+        public static final String COLUMN_EVENT_ID = "event_id";
+        public static final String COLUMN_ATTENDING = "attending";
 
         public static Uri buildUserUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        /**
-         * Define the user table columns
-         */
 
-        public static final String TABLE_NAME = "user";
-
-        public static final String COLUMN_USER_ID = "user_id";
-        public static final String COLUMN_EVENT_ID = "event_id";
-        public static final String COLUMN_ATTENDING = "attending";
     }
 
 }

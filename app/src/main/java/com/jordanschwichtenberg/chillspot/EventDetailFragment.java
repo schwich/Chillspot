@@ -24,7 +24,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public  class EventDetailFragment extends Fragment {
+public class EventDetailFragment extends Fragment {
 
     private String mEventID;
     private TextView mEventDetailTextView;
@@ -41,7 +41,7 @@ public  class EventDetailFragment extends Fragment {
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
             mEventID = intent.getStringExtra(Intent.EXTRA_TEXT);
             // strip whitespace and non-printable characters
-            mEventID = mEventID.replaceAll("\\s+","");
+            mEventID = mEventID.replaceAll("\\s+", "");
             //((TextView) rootView.findViewById(R.id.event_detail_text)).setText(mEventID);
         }
 
@@ -56,12 +56,11 @@ public  class EventDetailFragment extends Fragment {
 
     public class FetchEventDetailTask extends AsyncTask<Void, Void, String> {
 
-        private final String LOG_TAG = FetchEventDetailTask.class.getSimpleName();
-
         final String CHILLSPOT_EVENT_ADDRESS = "address";
         final String CHILLSPOT_EVENT_LATITUDE = "latitude";
         final String CHILLSPOT_EVENT_LONGITUDE = "longitude";
         final String CHILLSPOT_EVENT_STARTED_AT = "event_started";
+        private final String LOG_TAG = FetchEventDetailTask.class.getSimpleName();
 
         private String getEventDataFromJSON(String jsonStr) throws JSONException {
 
@@ -128,7 +127,7 @@ public  class EventDetailFragment extends Fragment {
                 eventDetailJsonStr = buffer.toString();
 
             } catch (IOException e) {
-                Log.e(LOG_TAG, "ERROR: " , e);
+                Log.e(LOG_TAG, "ERROR: ", e);
                 return null;
             } finally {
                 if (urlConnection != null) {

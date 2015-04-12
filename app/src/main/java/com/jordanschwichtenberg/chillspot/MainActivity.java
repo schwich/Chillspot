@@ -1,5 +1,6 @@
 package com.jordanschwichtenberg.chillspot;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,7 +19,7 @@ import android.widget.TextView;
 import com.jordanschwichtenberg.chillspot.sync.ChillspotSyncAdapter;
 
 
-public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
+public class MainActivity extends ActionBarActivity implements ActionBar.TabListener, EventListFragment.Callback {
 
     AppSectionsPagerAdapter mAppSectionsPagerAdapter;
     ViewPager mViewPager;
@@ -47,13 +48,17 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
         for (int i = 0; i < mAppSectionsPagerAdapter.getCount(); i++) {
             actionBar.addTab(actionBar.newTab()
-                                    .setText(mAppSectionsPagerAdapter.getPageTitle(i))
-                                    .setTabListener(this));
+                    .setText(mAppSectionsPagerAdapter.getPageTitle(i))
+                    .setTabListener(this));
         }
 
-        ChillspotSyncAdapter.syncImmediately(this);
+        ChillspotSyncAdapter.initializeSyncAdapter(this);
     }
 
+    @Override
+    public void onItemSelected(Uri eventUri) {
+        // TODO: implement this in conjunction with detail fragment
+    }
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {

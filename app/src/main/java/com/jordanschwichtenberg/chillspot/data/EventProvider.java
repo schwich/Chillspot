@@ -13,12 +13,10 @@ import android.net.Uri;
  */
 public class EventProvider extends ContentProvider {
 
-    private static final UriMatcher sUriMatcher = buildUriMatcher();
-
-    private EventDBHelper mOpenHelper;
-
     static final int EVENTS = 100;
     static final int USER = 200;
+    private static final UriMatcher sUriMatcher = buildUriMatcher();
+    private EventDBHelper mOpenHelper;
 
     static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -45,8 +43,7 @@ public class EventProvider extends ContentProvider {
         Cursor returnedCursor;
 
         switch (sUriMatcher.match(uri)) {
-            case EVENTS:
-            {
+            case EVENTS: {
                 returnedCursor = mOpenHelper.getReadableDatabase().query(
                         EventContract.EventEntry.TABLE_NAME,
                         projection,
@@ -59,8 +56,7 @@ public class EventProvider extends ContentProvider {
                 break;
             }
 
-            case USER:
-            {
+            case USER: {
                 returnedCursor = mOpenHelper.getReadableDatabase().query(
                         EventContract.UserEntry.TABLE_NAME,
                         projection,
@@ -104,8 +100,7 @@ public class EventProvider extends ContentProvider {
         Uri returnedUri;
 
         switch (match) {
-            case EVENTS:
-            {
+            case EVENTS: {
                 long _id = db.insert(EventContract.EventEntry.TABLE_NAME, null, values);
                 if (_id > 0) {
                     returnedUri = EventContract.EventEntry.buildEventUri(_id);
@@ -115,8 +110,7 @@ public class EventProvider extends ContentProvider {
                 break;
             }
 
-            case USER:
-            {
+            case USER: {
                 long _id = db.insert(EventContract.UserEntry.TABLE_NAME, null, values);
                 if (_id > 0) {
                     returnedUri = EventContract.UserEntry.buildUserUri(_id);
@@ -143,14 +137,12 @@ public class EventProvider extends ContentProvider {
         if (selection == null) selection = "1";
 
         switch (match) {
-            case EVENTS:
-            {
+            case EVENTS: {
                 rowsDeleted = db.delete(EventContract.EventEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
 
-            case USER:
-            {
+            case USER: {
                 rowsDeleted = db.delete(EventContract.UserEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
@@ -174,15 +166,13 @@ public class EventProvider extends ContentProvider {
         int rowsUpdated;
 
         switch (match) {
-            case EVENTS:
-            {
+            case EVENTS: {
                 rowsUpdated = db.update(EventContract.EventEntry.TABLE_NAME,
                         values, selection, selectionArgs);
                 break;
             }
 
-            case USER:
-            {
+            case USER: {
                 rowsUpdated = db.update(EventContract.UserEntry.TABLE_NAME,
                         values, selection, selectionArgs);
                 break;
@@ -206,8 +196,7 @@ public class EventProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
 
         switch (match) {
-            case EVENTS:
-            {
+            case EVENTS: {
                 db.beginTransaction();
                 int returnCount = 0;
                 try {

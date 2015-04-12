@@ -1,11 +1,13 @@
 package com.jordanschwichtenberg.chillspot;
 
-import android.content.Intent;
-import android.os.AsyncTask;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,30 +15,80 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
+import com.jordanschwichtenberg.chillspot.data.EventContract;
+import com.jordanschwichtenberg.chillspot.sync.ChillspotSyncAdapter;
 
 /**
  * Created by Jordan on 3/18/2015.
  */
-public class EventListFragment extends Fragment {
+public class EventListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private ArrayAdapter<String> mEventListAdapter;
+    private static final int EVENTS_LOADER = 0;
+
+    static final int COL__ID = 0;
+    static final int COL_EVENT_ID = 1;
+    static final int COL_EVENT_ADDRESS = 2;
+    static final int COL_EVENT_LATITUDE = 3;
+    static final int COL_EVENT_LONGITUDE = 4;
+    static final int COL_EVENT_CREATED_AT = 5;
+    static final int COL_EVENT_DISTANCE = 6;
+    static final int COL_EVENT_CATEGORY = 7;
+    static final int COL_EVENT_SUB_CATEGORY = 8;
+    static final int COL_EVENT_NOTE = 9;
+
+    private static final String[] EVENT_COLUMNS = {
+            EventContract.EventEntry.TABLE_NAME + "." + EventContract.EventEntry._ID,
+            EventContract.EventEntry.COLUMN_EVENT_ID,
+            EventContract.EventEntry.COLUMN_ADDRESS,
+            EventContract.EventEntry.COLUMN_LATITUDE,
+            EventContract.EventEntry.COLUMN_LONGITUDE,
+            EventContract.EventEntry.COLUMN_CREATED_AT,
+            EventContract.EventEntry.COLUMN_DISTANCE,
+            EventContract.EventEntry.COLUMN_CATEGORY,
+            EventContract.EventEntry.COLUMN_SUB_CATEGORY,
+            EventContract.EventEntry.COLUMN_NOTE
+    };
+
+    //private ArrayAdapter<String> mEventListAdapter;
+
+    private EventAdapter mEventAdapter;
+
+    private ListView mListView;
+    private int mPosition = ListView.INVALID_POSITION;
 
     public EventListFragment() {
 
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        // TODO: default sort order should be by distance
+        //String sortOrder = EventContract.EventEntry.COLUMN_DISTANCE + " ASC";
+        String sortOrder = null;
+        Uri eventsUri = EventContract.EventEntry.CONTENT_URI;
+
+        return new CursorLoader(getActivity(), eventsUri, EVENT_COLUMNS, null, null, sortOrder);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mEventAdapter.swapCursor(data);
+        if (mPosition != ListView.INVALID_POSITION) {
+            mListView.smoothScrollToPosition(mPosition);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mEventAdapter.swapCursor(null);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        getLoaderManager().initLoader(EVENTS_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
@@ -51,7 +103,19 @@ public class EventListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_eventlist, container, false);
 
-        ArrayList<String> temp = new ArrayList<>();
+        mEventAdapter = new EventAdapter(getActivity(), null, 0);
+
+        mListView = (ListView) rootView.findViewById(R.id.listview_eventlist);
+        mListView.setAdapter(mEventAdapter);
+
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // TODO: implement the detail fragment
+            }
+        });
+
+        /*ArrayList<String> temp = new ArrayList<>();
 
         mEventListAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_event,
                 R.id.list_item_event_textview, temp);
@@ -64,7 +128,7 @@ public class EventListFragment extends Fragment {
                 String eventIDStr = mEventListAdapter.getItem(position);
                 String eventID = eventIDStr.split(" ")[1];
                 eventID = eventID.split("\n")[0];
-                eventID = eventID.replaceAll("\\s+","");
+                eventID = eventID.replaceAll("\\s+", "");
 
                 Log.v("HELLO", "EVENT ID SENT TO FRAGMENT: " + eventID);
 
@@ -76,7 +140,7 @@ public class EventListFragment extends Fragment {
 
         // kick off async task
         FetchEventsListTask eventTask = new FetchEventsListTask();
-        eventTask.execute();
+        eventTask.execute();*/
 
         return rootView;
     }
@@ -91,23 +155,24 @@ public class EventListFragment extends Fragment {
         int id = item.getItemId();
 
         if (id == R.id.action_refresh) {
-            // kick off async task
-            FetchEventsListTask eventTask = new FetchEventsListTask();
-            eventTask.execute();
+            ChillspotSyncAdapter.syncImmediately(getActivity());
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    public class FetchEventsListTask extends AsyncTask<Void, Void, String[]> {
+    public interface Callback {
+        public void onItemSelected(Uri eventUri);
+    }
 
-        private final String LOG_TAG = FetchEventsListTask.class.getSimpleName();
+    /*public class FetchEventsListTask extends AsyncTask<Void, Void, String[]> {
 
         final String CHILLSPOT_EVENT_ID = "id";
         final String CHILLSPOT_EVENT_ADDRESS = "address";
         final String CHILLSPOT_EVENT_LATITUDE = "latitude";
         final String CHILLSPOT_EVENT_LONGITUDE = "longitude";
+        private final String LOG_TAG = FetchEventsListTask.class.getSimpleName();
 
         private String[] getEventDataFromJSON(String jsonStr) throws JSONException {
 
@@ -214,5 +279,5 @@ public class EventListFragment extends Fragment {
                 }
             }
         }
-    }
+    }*/
 }

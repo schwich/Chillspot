@@ -25,6 +25,7 @@ public class ChillspotAuthenticatorService extends Service {
     /**
      * When the system binds to this Service to make the RPC call
      * return the authenticator's IBinder.
+     *
      * @param intent passed in
      * @return the authenticator's IBinder.
      */
