@@ -1,5 +1,6 @@
 package com.jordanschwichtenberg.chillspot;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -57,7 +58,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
     @Override
     public void onItemSelected(Uri eventUri) {
-        // TODO: implement this in conjunction with detail fragment
+        Intent intent = new Intent(this, EventDetailActivity.class)
+                .setData(eventUri);
+        startActivity(intent);
     }
 
     @Override

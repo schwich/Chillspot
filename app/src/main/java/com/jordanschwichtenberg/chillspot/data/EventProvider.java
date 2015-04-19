@@ -14,9 +14,13 @@ import android.net.Uri;
 public class EventProvider extends ContentProvider {
 
     static final int EVENTS = 100;
+    static final int EVENT_WITH_ID = 101;
     static final int USER = 200;
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private EventDBHelper mOpenHelper;
+
+    // events.event_id = ?
+    private static final String sEventWithIdSelection = EventContract.EventEntry.COLUMN_EVENT_ID + " = ? ";
 
     static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -24,6 +28,9 @@ public class EventProvider extends ContentProvider {
 
         // URI to return all events
         matcher.addURI(authority, EventContract.PATH_EVENTS, EVENTS);
+        // URI to return a specific event
+        // matches events/# where # is any number
+        matcher.addURI(authority, EventContract.PATH_EVENTS + "/#", EVENT_WITH_ID);
         // URI to return the user's details
         matcher.addURI(authority, EventContract.PATH_USER, USER);
 
@@ -49,6 +56,21 @@ public class EventProvider extends ContentProvider {
                         projection,
                         selection,
                         selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+
+            case EVENT_WITH_ID: {
+                String id = EventContract.EventEntry.getIdFromUri(uri);
+
+                returnedCursor = mOpenHelper.getReadableDatabase().query(
+                        EventContract.EventEntry.TABLE_NAME,
+                        projection,
+                        sEventWithIdSelection,
+                        new String[]{id},
                         null,
                         null,
                         sortOrder
@@ -85,8 +107,11 @@ public class EventProvider extends ContentProvider {
         switch (match) {
             case EVENTS:
                 return EventContract.EventEntry.CONTENT_TYPE;
+            case EVENT_WITH_ID:
+                return EventContract.EventEntry.CONTENT_ITEM_TYPE;
             case USER:
                 return EventContract.UserEntry.CONTENT_ITEM_TYPE;
+
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }

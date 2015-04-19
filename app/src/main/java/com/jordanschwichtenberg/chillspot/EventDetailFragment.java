@@ -4,30 +4,63 @@ package com.jordanschwichtenberg.chillspot;
  * Created by Jordan on 3/18/2015.
  */
 
-import android.content.Intent;
-import android.os.AsyncTask;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.jordanschwichtenberg.chillspot.data.EventContract;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+public class EventDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-public class EventDetailFragment extends Fragment {
+    public static final String EVENT_DETAIL_URI = "URI";
 
-    private String mEventID;
-    private TextView mEventDetailTextView;
+    private Uri mUri;
+
+    private static final int EVENT_DETAIL_LOADER = 0;
+
+    private static final String[] EVENT_DETAIL_COLUMNS = {
+        EventContract.EventEntry.TABLE_NAME + "." + EventContract.EventEntry._ID,
+        EventContract.EventEntry.COLUMN_EVENT_ID,
+        EventContract.EventEntry.COLUMN_ADDRESS,
+        EventContract.EventEntry.COLUMN_LATITUDE,
+        EventContract.EventEntry.COLUMN_LONGITUDE,
+        EventContract.EventEntry.COLUMN_CREATED_AT,
+        EventContract.EventEntry.COLUMN_DISTANCE,
+        EventContract.EventEntry.COLUMN_CATEGORY,
+        EventContract.EventEntry.COLUMN_SUB_CATEGORY,
+        EventContract.EventEntry.COLUMN_NOTE
+    };
+
+    static final int COL__ID = 0;
+    static final int COL_EVENT_ID = 1;
+    static final int COL_EVENT_ADDRESS = 2;
+    static final int COL_EVENT_LATITUDE = 3;
+    static final int COL_EVENT_LONGITUDE = 4;
+    static final int COL_EVENT_CREATED_AT = 5;
+    static final int COL_EVENT_DISTANCE = 6;
+    static final int COL_EVENT_CATEGORY = 7;
+    static final int COL_EVENT_SUB_CATEGORY = 8;
+    static final int COL_EVENT_NOTE = 9;
+
+    private TextView mSubCategoryView;
+    private TextView mCategoryView;
+    private TextView mAddressView;
+    private TextView mDistanceView;
+    private TextView mCreatedAtView;
+    private TextView mLatitudeView;
+    private TextView mLongitudeView;
+    private TextView mNoteView;
+    private Button mJoinEventButton;
 
     public EventDetailFragment() {
     }
@@ -35,26 +68,88 @@ public class EventDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_event_detail, container, false);
 
-        Intent intent = getActivity().getIntent();
-        if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
-            mEventID = intent.getStringExtra(Intent.EXTRA_TEXT);
-            // strip whitespace and non-printable characters
-            mEventID = mEventID.replaceAll("\\s+", "");
-            //((TextView) rootView.findViewById(R.id.event_detail_text)).setText(mEventID);
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            mUri = arguments.getParcelable(EVENT_DETAIL_URI);
         }
 
-        mEventDetailTextView = (TextView) rootView.findViewById(R.id.event_detail_text);
+        View rootView = inflater.inflate(R.layout.fragment_event_detail, container, false);
 
-        // kick off async task
+        mSubCategoryView = (TextView) rootView.findViewById(R.id.detail_subcategory_textview);
+        mCategoryView = (TextView) rootView.findViewById(R.id.detail_category_textview);
+        mAddressView = (TextView) rootView.findViewById(R.id.detail_address_textview);
+        // TODO: Add when distance is finally in database
+        //mDistanceView = (TextView) rootView.findViewById(R.id.detail_distance_textview);
+        mCreatedAtView = (TextView) rootView.findViewById(R.id.detail_created_at_textview);
+        mLatitudeView = (TextView) rootView.findViewById(R.id.detail_lat_textview);
+        mLongitudeView = (TextView) rootView.findViewById(R.id.detail_lon_textview);
+        mNoteView = (TextView) rootView.findViewById(R.id.detail_note_textview);
+
+        mJoinEventButton = (Button) rootView.findViewById(R.id.detail_join_button);
+        mJoinEventButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO: make API call to join event, then transition to the YourEventFragment(from the MainActivity)
+            }
+        });
+
+        /*// kick off async task
         FetchEventDetailTask eventTask = new FetchEventDetailTask();
-        eventTask.execute();
+        eventTask.execute();*/
 
         return rootView;
     }
 
-    public class FetchEventDetailTask extends AsyncTask<Void, Void, String> {
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        getLoaderManager().initLoader(EVENT_DETAIL_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        if (mUri != null) {
+            return new CursorLoader(getActivity(), mUri, EVENT_DETAIL_COLUMNS, null, null, null);
+        }
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        if (data != null && data.moveToFirst()) {
+            String subcat = data.getString(COL_EVENT_SUB_CATEGORY);
+            mSubCategoryView.setText(subcat);
+
+            String cat = data.getString(COL_EVENT_CATEGORY);
+            mCategoryView.setText(cat);
+
+            String address = data.getString(COL_EVENT_ADDRESS);
+            mAddressView.setText("Address\n" + address);
+
+            // TODO: set distance textview to returned distance
+
+            String created_at = data.getString(COL_EVENT_CREATED_AT);
+            mCreatedAtView.setText(created_at);
+
+            Double lat = data.getDouble(COL_EVENT_LATITUDE);
+            mLatitudeView.setText("Latitude: " + Double.toString(lat));
+
+            Double lon = data.getDouble(COL_EVENT_LONGITUDE);
+            mLongitudeView.setText("Longitude: " + Double.toString(lon));
+
+            String note = data.getString(COL_EVENT_NOTE);
+            mNoteView.setText("Note\n" + note);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+    /*public class FetchEventDetailTask extends AsyncTask<Void, Void, String> {
 
         final String CHILLSPOT_EVENT_ADDRESS = "address";
         final String CHILLSPOT_EVENT_LATITUDE = "latitude";
@@ -162,5 +257,5 @@ public class EventDetailFragment extends Fragment {
                 mEventDetailTextView.setText(result);
             }
         }
-    }
+    }*/
 }

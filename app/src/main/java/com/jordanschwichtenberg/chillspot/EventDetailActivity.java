@@ -13,8 +13,14 @@ public class EventDetailActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_detail);
         if (savedInstanceState == null) {
+            Bundle arguments = new Bundle();
+            arguments.putParcelable(EventDetailFragment.EVENT_DETAIL_URI, getIntent().getData());
+
+            EventDetailFragment fragment = new EventDetailFragment();
+            fragment.setArguments(arguments);
+
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new EventDetailFragment())
+                    .add(R.id.container, fragment)
                     .commit();
         }
     }

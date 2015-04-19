@@ -111,34 +111,15 @@ public class EventListFragment extends Fragment implements LoaderManager.LoaderC
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // TODO: implement the detail fragment
+                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                if (cursor != null) {
+                    ((Callback) getActivity())
+                            .onItemSelected(EventContract.EventEntry.buildEventUri(cursor.getLong(COL_EVENT_ID)));
+                }
             }
         });
 
-        /*ArrayList<String> temp = new ArrayList<>();
-
-        mEventListAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_event,
-                R.id.list_item_event_textview, temp);
-
-        ListView listView = (ListView) rootView.findViewById(R.id.listview_eventlist);
-        listView.setAdapter(mEventListAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String eventIDStr = mEventListAdapter.getItem(position);
-                String eventID = eventIDStr.split(" ")[1];
-                eventID = eventID.split("\n")[0];
-                eventID = eventID.replaceAll("\\s+", "");
-
-                Log.v("HELLO", "EVENT ID SENT TO FRAGMENT: " + eventID);
-
-                Intent intent = new Intent(getActivity(), EventDetailActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, eventID);
-                startActivity(intent);
-            }
-        });
-
-        // kick off async task
+        /*// kick off async task
         FetchEventsListTask eventTask = new FetchEventsListTask();
         eventTask.execute();*/
 
