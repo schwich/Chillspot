@@ -3,20 +3,16 @@ package com.jordanschwichtenberg.chillspot;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
+import com.google.android.gms.maps.SupportMapFragment;
 import com.jordanschwichtenberg.chillspot.sync.ChillspotSyncAdapter;
 
 
@@ -109,18 +105,25 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         @Override
         public Fragment getItem(int i) {
             switch (i) {
+
+                // map fragment
+                case 0:
+
+                    SupportMapFragment mapFragment = new MapFragment();
+                    return mapFragment;
+
+                // event list fragment
                 case 1:
-                    // list fragment
                     Fragment listFragment = new EventListFragment();
                     return listFragment;
 
+                // your event fragment
+                case 2:
+                    Fragment yourEventFragment = new YourEventFragment();
+                    return yourEventFragment;
+
                 default:
-                    // map fragment, return dummy fragment for now
-                    Fragment fragment = new DummySectionFragment();
-                    Bundle args = new Bundle();
-                    args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, i + 1);
-                    fragment.setArguments(args);
-                    return fragment;
+                    return null;
             }
         }
 
@@ -132,19 +135,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         @Override
         public CharSequence getPageTitle(int position) {
             return "Section " + (position + 1);
-        }
-    }
-
-    public static class DummySectionFragment extends Fragment {
-        public static final String ARG_SECTION_NUMBER = "section_number";
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_section_dummy, container, false);
-            Bundle args = getArguments();
-            ((TextView) rootView.findViewById(android.R.id.text1)).setText(
-                    getString(R.string.dummy_section_text, args.getInt(ARG_SECTION_NUMBER)));
-            return rootView;
         }
     }
 }
