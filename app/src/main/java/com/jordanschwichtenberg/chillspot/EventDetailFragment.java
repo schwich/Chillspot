@@ -79,8 +79,7 @@ public class EventDetailFragment extends Fragment implements LoaderManager.Loade
         mSubCategoryView = (TextView) rootView.findViewById(R.id.detail_subcategory_textview);
         mCategoryView = (TextView) rootView.findViewById(R.id.detail_category_textview);
         mAddressView = (TextView) rootView.findViewById(R.id.detail_address_textview);
-        // TODO: Add when distance is finally in database
-        //mDistanceView = (TextView) rootView.findViewById(R.id.detail_distance_textview);
+        mDistanceView = (TextView) rootView.findViewById(R.id.detail_distance_textview);
         mCreatedAtView = (TextView) rootView.findViewById(R.id.detail_created_at_textview);
         mLatitudeView = (TextView) rootView.findViewById(R.id.detail_lat_textview);
         mLongitudeView = (TextView) rootView.findViewById(R.id.detail_lon_textview);
@@ -126,12 +125,15 @@ public class EventDetailFragment extends Fragment implements LoaderManager.Loade
             mCategoryView.setText(cat);
 
             String address = data.getString(COL_EVENT_ADDRESS);
-            mAddressView.setText("Address\n" + address);
+            mAddressView.setText("Address:\n" + address);
 
-            // TODO: set distance textview to returned distance
+            // TODO: set distance to human readable format
+            Double distance = data.getDouble(COL_EVENT_DISTANCE);
+            //String formatted_distance = Utility.formatDistance(getActivity(), distance);
+            mDistanceView.setText("Distance:\n" + Double.toString(distance));
 
             String created_at = data.getString(COL_EVENT_CREATED_AT);
-            mCreatedAtView.setText(created_at);
+            mCreatedAtView.setText("Created At:\n" + created_at);
 
             Double lat = data.getDouble(COL_EVENT_LATITUDE);
             mLatitudeView.setText("Latitude: " + Double.toString(lat));

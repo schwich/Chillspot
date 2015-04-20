@@ -64,9 +64,7 @@ public class EventListFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        // TODO: default sort order should be by distance
-        //String sortOrder = EventContract.EventEntry.COLUMN_DISTANCE + " ASC";
-        String sortOrder = null;
+        String sortOrder = EventContract.EventEntry.COLUMN_DISTANCE + " ASC";
         Uri eventsUri = EventContract.EventEntry.CONTENT_URI;
 
         return new CursorLoader(getActivity(), eventsUri, EVENT_COLUMNS, null, null, sortOrder);

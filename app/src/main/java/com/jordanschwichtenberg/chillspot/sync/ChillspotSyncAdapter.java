@@ -9,11 +9,13 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SyncRequest;
 import android.content.SyncResult;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.jordanschwichtenberg.chillspot.R;
+import com.jordanschwichtenberg.chillspot.Utility;
 import com.jordanschwichtenberg.chillspot.data.EventContract;
 
 import org.json.JSONArray;
@@ -139,8 +141,12 @@ public class ChillspotSyncAdapter extends AbstractThreadedSyncAdapter {
 
         // create connection to chillspot api, and open the connection
         try {
-            // TODO: add location query params
-            url = new URL("http://evening-harbor-2864.herokuapp.com/events");
+            Location location = Utility.getLastLocation();
+            url = new URL("http://evening-harbor-2864.herokuapp.com/events?latitude=" +
+            String.valueOf(location.getLatitude()) + "&longitude=" +
+            String.valueOf(location.getLongitude()));
+
+            Log.d("GPS", String.valueOf(url));
 
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
@@ -227,8 +233,7 @@ public class ChillspotSyncAdapter extends AbstractThreadedSyncAdapter {
             latitude = eventObject.getDouble(CHILLSPOT_EVENT_LATITUDE);
             longitude = eventObject.getDouble(CHILLSPOT_EVENT_LONGITUDE);
             created_at = eventObject.getString(CHILLSPOT_EVENT_CREATED_AT);
-            // TODO: add this when location query params are added
-            //distance = eventObject.getDouble(CHILLSPOT_EVENT_DISTANCE);
+            distance = eventObject.getDouble(CHILLSPOT_EVENT_DISTANCE);
             category = eventObject.getString(CHILLSPOT_EVENT_CATEGORY);
             sub_category = eventObject.getString(CHILLSPOT_EVENT_SUB_CATEGORY);
             note = eventObject.getString(CHILLSPOT_EVENT_NOTE);
@@ -241,8 +246,7 @@ public class ChillspotSyncAdapter extends AbstractThreadedSyncAdapter {
             eventValues.put(EventContract.EventEntry.COLUMN_LATITUDE, latitude);
             eventValues.put(EventContract.EventEntry.COLUMN_LONGITUDE, longitude);
             eventValues.put(EventContract.EventEntry.COLUMN_CREATED_AT, created_at);
-            // TODO: add this when location query params are added
-            //eventValues.put(EventContract.EventEntry.COLUMN_DISTANCE, distance);
+            eventValues.put(EventContract.EventEntry.COLUMN_DISTANCE, distance);
             eventValues.put(EventContract.EventEntry.COLUMN_CATEGORY, category);
             eventValues.put(EventContract.EventEntry.COLUMN_SUB_CATEGORY, sub_category);
             eventValues.put(EventContract.EventEntry.COLUMN_NOTE, note);
