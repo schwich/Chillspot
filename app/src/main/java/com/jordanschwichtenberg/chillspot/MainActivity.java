@@ -25,7 +25,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
     AppSectionsPagerAdapter mAppSectionsPagerAdapter;
     ViewPager mViewPager;
-    GoogleApiClient mGoogleApiClient;
+    static GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
