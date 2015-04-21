@@ -142,9 +142,14 @@ public class ChillspotSyncAdapter extends AbstractThreadedSyncAdapter {
         // create connection to chillspot api, and open the connection
         try {
             Location location = Utility.getLastLocation();
-            url = new URL("http://evening-harbor-2864.herokuapp.com/events?latitude=" +
-            String.valueOf(location.getLatitude()) + "&longitude=" +
-            String.valueOf(location.getLongitude()));
+            if (location != null) {
+                url = new URL("http://evening-harbor-2864.herokuapp.com/events?latitude=" +
+                        String.valueOf(location.getLatitude()) + "&longitude=" +
+                        String.valueOf(location.getLongitude()));
+            } else {
+                url = new URL("http://evening-harbor-2864.herokuapp.com/events");
+            }
+
 
             Log.d("GPS", String.valueOf(url));
 
