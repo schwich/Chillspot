@@ -1,7 +1,6 @@
 package com.jordanschwichtenberg.chillspot;
 
 import android.content.Intent;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,19 +12,14 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.jordanschwichtenberg.chillspot.sync.ChillspotSyncAdapter;
 
 
-public class MainActivity extends ActionBarActivity implements ActionBar.TabListener, EventListFragment.Callback,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends ActionBarActivity implements ActionBar.TabListener, EventListFragment.Callback {
 
     AppSectionsPagerAdapter mAppSectionsPagerAdapter;
     ViewPager mViewPager;
-    static GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,41 +50,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         }
 
         ChillspotSyncAdapter.initializeSyncAdapter(this);
-
-        buildGoogleApiClient();
-    }
-
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-    }
-
-    @Override
-    protected void onStart() {
-        mGoogleApiClient.connect();
-        super.onStart();
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-
-        if (location != null) {
-            Utility.setLastLocation(location);
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
     }
 
     @Override
@@ -175,7 +134,16 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return "Section " + (position + 1);
+            switch (position) {
+                case 0:
+                    return "nearby";
+                case 1:
+                    return "browse";
+                case 2:
+                    return "your event";
+                default:
+                    return null;
+            }
         }
     }
 }

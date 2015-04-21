@@ -75,8 +75,13 @@ public class MapFragment extends SupportMapFragment implements LoaderManager.Loa
 
         // update map position
         Location myLocation = Utility.getLastLocation();
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()), 13);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()), 12);
         mMap.animateCamera(cameraUpdate);
+
+        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+        Log.d("MAP", String.valueOf(mMap.getUiSettings().isMyLocationButtonEnabled()));
     }
 
     @Override
@@ -89,6 +94,14 @@ public class MapFragment extends SupportMapFragment implements LoaderManager.Loa
 
     }
 
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
@@ -97,19 +110,29 @@ public class MapFragment extends SupportMapFragment implements LoaderManager.Loa
         mView = (MapView) layout.findViewById(R.id.mapView);
         mView.onCreate(savedInstanceState);
 
+        buildGoogleApiClient();
+
         mMap = mView.getMap();
+        mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
         MapsInitializer.initialize(this.getActivity());
 
-        // zoom camera to current location
-        /*Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);*/
+        CameraUpdate cameraUpdate;
 
-        // TODO: Have map zoom in on your current location
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(37.6916439, -122.474819), 13);
-        mMap.animateCamera(cameraUpdate);
+        if (Utility.getLastLocation() != null) {
+            Location loc = Utility.getLastLocation();
+            cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(loc.getLatitude(), loc.getLongitude()), 12);
+            mMap.animateCamera(cameraUpdate);
+        }
 
         return layout;
+    }
+
+    @Override
+    public void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
     }
 
     @Override
@@ -136,14 +159,12 @@ public class MapFragment extends SupportMapFragment implements LoaderManager.Loa
 
     private void updateMapMarkers() {
 
-        Log.d("MAP", "Does updateMapMarkers get called?");
-
         while (mCursor.moveToNext()) {
             LatLng eventLocation = new LatLng(mCursor.getDouble(COL_EVENT_LATITUDE),
                     mCursor.getDouble(COL_EVENT_LONGITUDE));
             mMap.addMarker(new MarkerOptions()
                 .position(eventLocation)
-                .title("Event"));
+                .title(mCursor.getString(COL_EVENT_SUB_CATEGORY)));
         }
     }
 
@@ -156,8 +177,6 @@ public class MapFragment extends SupportMapFragment implements LoaderManager.Loa
     public void onResume() {
         super.onResume();
         mView.onResume();
-
-        //setUpMapIfNeeded();
     }
 
     @Override
