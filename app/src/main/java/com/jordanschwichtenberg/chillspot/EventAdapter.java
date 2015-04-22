@@ -37,9 +37,11 @@ public class EventAdapter extends CursorAdapter {
         viewHolder.categoryView.setText(category);
 
         double distance = cursor.getDouble(EventListFragment.COL_EVENT_DISTANCE);
-        viewHolder.distanceView.setText(Double.toString(distance));
+        distance = Utility.roundDistance(distance, 2);
+        viewHolder.distanceView.setText("Distance: " + Double.toString(distance) + " miles");
 
-        // TODO: add attending count
+        int people_attending = cursor.getInt(EventListFragment.COL_PEOPLE_ATTENDING);
+        viewHolder.attendingView.setText("Attending: " + Integer.toString(people_attending));
 
 
     }

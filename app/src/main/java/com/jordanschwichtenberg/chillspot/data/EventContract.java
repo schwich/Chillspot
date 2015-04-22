@@ -46,7 +46,7 @@ public class EventContract {
         public static final String COLUMN_CATEGORY = "category";
         public static final String COLUMN_SUB_CATEGORY = "sub_category";
         public static final String COLUMN_NOTE = "note";
-        public static final String COLUMN_ATTENDING_COUNT = "attending_count";
+        public static final String COLUMN_PEOPLE_ATTENDING = "people_attending";
 
         public static Uri buildEventUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
@@ -78,7 +78,7 @@ public class EventContract {
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_USER;
         public static final String COLUMN_EVENT_ID = "event_id";
-        public static final String COLUMN_ATTENDING = "attending";
+        public static final String COLUMN_PEOPLE_ATTENDING = "people_attending";
 
         public static Uri buildUserUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
