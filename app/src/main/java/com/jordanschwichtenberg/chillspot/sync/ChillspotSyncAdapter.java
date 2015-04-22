@@ -118,7 +118,7 @@ public class ChillspotSyncAdapter extends AbstractThreadedSyncAdapter {
         /*
          * Finally, let's do a sync to get things started
          */
-        syncImmediately(context);
+        //syncImmediately(context);
     }
 
     public static void initializeSyncAdapter(Context context) {
@@ -148,6 +148,7 @@ public class ChillspotSyncAdapter extends AbstractThreadedSyncAdapter {
                         String.valueOf(location.getLongitude()));
             } else {
                 url = new URL("http://evening-harbor-2864.herokuapp.com/events");
+                Log.e("WHAT", "Does it send default URL to api to get events list?");
             }
 
 
@@ -179,6 +180,9 @@ public class ChillspotSyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
             eventsListJsonStr = buffer.toString();
+
+            Log.v("WHAT", "Returned json: " + eventsListJsonStr);
+
             getEventDataFromJSON(eventsListJsonStr);
 
         } catch (IOException e) {
@@ -214,6 +218,7 @@ public class ChillspotSyncAdapter extends AbstractThreadedSyncAdapter {
         final String CHILLSPOT_EVENT_CATEGORY = "category";
         final String CHILLSPOT_EVENT_SUB_CATEGORY = "sub_category";
         final String CHILLSPOT_EVENT_NOTE = "note";
+        final String CHILLSPOT_EVENT_PEOPLE_ATTENDING = "people_attending";
 
         JSONArray eventsList = new JSONArray(jsonStr);
 
@@ -230,6 +235,8 @@ public class ChillspotSyncAdapter extends AbstractThreadedSyncAdapter {
             String category;
             String sub_category;
             String note;
+            int people_attending;
+            //String people_attending;
 
             // Get the JSON data
             JSONObject eventObject = eventsList.getJSONObject(i);
@@ -242,6 +249,8 @@ public class ChillspotSyncAdapter extends AbstractThreadedSyncAdapter {
             category = eventObject.getString(CHILLSPOT_EVENT_CATEGORY);
             sub_category = eventObject.getString(CHILLSPOT_EVENT_SUB_CATEGORY);
             note = eventObject.getString(CHILLSPOT_EVENT_NOTE);
+            people_attending = eventObject.getInt(CHILLSPOT_EVENT_PEOPLE_ATTENDING);
+            //people_attending = eventObject.getString(CHILLSPOT_EVENT_PEOPLE_ATTENDING);
 
             ContentValues eventValues = new ContentValues();
 
@@ -255,6 +264,7 @@ public class ChillspotSyncAdapter extends AbstractThreadedSyncAdapter {
             eventValues.put(EventContract.EventEntry.COLUMN_CATEGORY, category);
             eventValues.put(EventContract.EventEntry.COLUMN_SUB_CATEGORY, sub_category);
             eventValues.put(EventContract.EventEntry.COLUMN_NOTE, note);
+            eventValues.put(EventContract.EventEntry.COLUMN_PEOPLE_ATTENDING, people_attending);
 
             // add each row to the vector containing all rows
             contentValuesVector.add(eventValues);

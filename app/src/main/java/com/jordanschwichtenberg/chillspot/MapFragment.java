@@ -26,6 +26,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.jordanschwichtenberg.chillspot.data.EventContract;
+import com.jordanschwichtenberg.chillspot.sync.ChillspotSyncAdapter;
 
 public class MapFragment extends SupportMapFragment implements LoaderManager.LoaderCallbacks<Cursor>, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
@@ -80,6 +81,8 @@ public class MapFragment extends SupportMapFragment implements LoaderManager.Loa
 
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+        ChillspotSyncAdapter.syncImmediately(getActivity());
 
         Log.d("MAP", String.valueOf(mMap.getUiSettings().isMyLocationButtonEnabled()));
     }

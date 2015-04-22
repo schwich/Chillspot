@@ -37,6 +37,7 @@ public class EventListFragment extends Fragment implements LoaderManager.LoaderC
     static final int COL_EVENT_CATEGORY = 7;
     static final int COL_EVENT_SUB_CATEGORY = 8;
     static final int COL_EVENT_NOTE = 9;
+    static final int COL_PEOPLE_ATTENDING = 10;
 
     private static final String[] EVENT_COLUMNS = {
             EventContract.EventEntry.TABLE_NAME + "." + EventContract.EventEntry._ID,
@@ -48,7 +49,8 @@ public class EventListFragment extends Fragment implements LoaderManager.LoaderC
             EventContract.EventEntry.COLUMN_DISTANCE,
             EventContract.EventEntry.COLUMN_CATEGORY,
             EventContract.EventEntry.COLUMN_SUB_CATEGORY,
-            EventContract.EventEntry.COLUMN_NOTE
+            EventContract.EventEntry.COLUMN_NOTE,
+            EventContract.EventEntry.COLUMN_PEOPLE_ATTENDING
     };
 
     //private ArrayAdapter<String> mEventListAdapter;
