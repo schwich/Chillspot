@@ -4,6 +4,7 @@ package com.jordanschwichtenberg.chillspot;
  * Created by Jordan on 3/18/2015.
  */
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
@@ -106,6 +107,15 @@ public class EventDetailFragment extends Fragment implements LoaderManager.Loade
                 // TODO: make API call to join event, then transition to the YourEventFragment(from the MainActivity)
                 JoinEventTask apiCall = new JoinEventTask();
                 apiCall.execute();
+
+                // now, navigate to your event tab
+                YourEventFragment.updateViewFlag = true;
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                intent.putExtra("tabPosition", MainActivity.YOUR_EVENT_TAB_INDEX);
+                startActivity(intent);
+
+                // finish this
+                getActivity().finish();
             }
         });
 

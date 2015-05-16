@@ -54,6 +54,8 @@ public class YourEventFragment extends Fragment implements LoaderManager.LoaderC
     private TextView mLongitudeView;
     private TextView mNoteView;
 
+    public static boolean updateViewFlag = false;
+
     private static final int YOUR_EVENT_DETAIL_LOADER = 1;
 
     private static final String[] EVENT_DETAIL_COLUMNS = {
@@ -98,7 +100,10 @@ public class YourEventFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onResume() {
         super.onResume();
-        updateEventView();
+        if (updateViewFlag) {
+            updateEventView();
+            updateViewFlag = false;
+        }
     }
 
     @Override
@@ -180,7 +185,6 @@ public class YourEventFragment extends Fragment implements LoaderManager.LoaderC
             public void onClick(View v) {
                 LeaveEventTask apiCall = new LeaveEventTask();
                 apiCall.execute();
-                updateEventView();
             }
         });
 
@@ -211,7 +215,21 @@ public class YourEventFragment extends Fragment implements LoaderManager.LoaderC
         mIdOfUserEvent = sharedPreferences.getInt("event_id_of_user", -1);
         Log.v("YourEventFragment", "in onCreateView--- Event id of user: " + String.valueOf(mIdOfUserEvent));
 
-        updateEventView();
+        if (mIdOfUserEvent != -1) {
+            mCreateEventButton.setVisibility(View.GONE);
+
+            mLeaveEventButton.setVisibility(View.VISIBLE);
+            mGetDirectionsButton.setVisibility(View.VISIBLE);
+
+            mYourEventView.setVisibility(View.VISIBLE);
+        } else {
+            Log.v("API", "User's event_id: " + String.valueOf(mIdOfUserEvent));
+
+            mCreateEventButton.setVisibility(View.VISIBLE);
+            mLeaveEventButton.setVisibility(View.GONE);
+            mGetDirectionsButton.setVisibility(View.GONE);
+            mYourEventView.setVisibility(View.GONE);
+        }
 
         return rootView;
     }
@@ -232,6 +250,15 @@ public class YourEventFragment extends Fragment implements LoaderManager.LoaderC
             mGetDirectionsButton.setVisibility(View.GONE);
             mYourEventView.setVisibility(View.GONE);
         }
+
+        ((Callback) getActivity())
+                .refreshYourEventView();
+
+
+    }
+
+    public interface Callback {
+        public void refreshYourEventView();
     }
 
     @Override
@@ -245,7 +272,7 @@ public class YourEventFragment extends Fragment implements LoaderManager.LoaderC
 
         if (id == R.id.action_refresh_your_event_view) {
             updateEventView();
-            Log.v("API", "refresh your event called");
+            Log.v("WHAT", "refresh your event called");
             return true;
         }
 
@@ -364,6 +391,8 @@ public class YourEventFragment extends Fragment implements LoaderManager.LoaderC
         @Override
         protected void onPostExecute(String result) {
             if (result != null) Log.v(LOG_TAG, "After request: " + result);
+            mIdOfUserEvent = -1;
+            updateEventView();
         }
     }
 }

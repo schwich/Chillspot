@@ -18,7 +18,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.jordanschwichtenberg.chillspot.sync.ChillspotSyncAdapter;
 
 
-public class MainActivity extends ActionBarActivity implements EventListFragment.Callback {
+public class MainActivity extends ActionBarActivity implements EventListFragment.Callback, YourEventFragment.Callback {
     // removed implements ActionBar.TabListener
 
     AppSectionsPagerAdapter mAppSectionsPagerAdapter;
@@ -29,9 +29,11 @@ public class MainActivity extends ActionBarActivity implements EventListFragment
     private Fragment mEventListFragment;
     private Fragment mYourEventFragment;
 
-    private final int MAP_TAB_INDEX = 0;
-    private final int EVENT_LIST_TAB_INDEX = 1;
-    private final int YOUR_EVENT_TAB_INDEX = 2;
+    //private final ActionBar mActionBar;
+
+    public static final int MAP_TAB_INDEX = 0;
+    public static final int EVENT_LIST_TAB_INDEX = 1;
+    public static final int YOUR_EVENT_TAB_INDEX = 2;
 
 
     @Override
@@ -52,6 +54,7 @@ public class MainActivity extends ActionBarActivity implements EventListFragment
         mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(getSupportFragmentManager());
 
         final ActionBar actionBar = getSupportActionBar();
+        //mActionBar = getSupportActionBar();
 
         actionBar.setHomeButtonEnabled(false);
 
@@ -162,13 +165,30 @@ public class MainActivity extends ActionBarActivity implements EventListFragment
 
                     @Override
                     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-
+                        fragmentTransaction.detach(mYourEventFragment);
+                        fragmentTransaction.attach(mYourEventFragment);
                     }
                 });
 
         actionBar.addTab(tab);
 
+        // which tab to select
+        Intent intent = getIntent();
+        int tabToOpen = intent.getIntExtra("tabPosition", -1);
+        if (tabToOpen != -1) {
+            // open the specific tab
+            actionBar.setSelectedNavigationItem(tabToOpen);
+        }
+
         ChillspotSyncAdapter.initializeSyncAdapter(this);
+    }
+
+    @Override
+    public void refreshYourEventView() {
+        YourEventFragment.updateViewFlag = true;
+        getSupportActionBar().setSelectedNavigationItem(EVENT_LIST_TAB_INDEX);
+        getSupportActionBar().setSelectedNavigationItem(YOUR_EVENT_TAB_INDEX);
+
     }
 
     @Override
@@ -177,6 +197,7 @@ public class MainActivity extends ActionBarActivity implements EventListFragment
                 .setData(eventUri);
         startActivity(intent);
     }
+
 
     /*@Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
