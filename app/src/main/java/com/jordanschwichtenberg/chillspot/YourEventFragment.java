@@ -101,6 +101,7 @@ public class YourEventFragment extends Fragment implements LoaderManager.LoaderC
     public void onResume() {
         super.onResume();
         if (updateViewFlag) {
+            Log.v("WHAT!!!", "updateView called in onResume");
             updateEventView();
             updateViewFlag = false;
         }
@@ -229,6 +230,13 @@ public class YourEventFragment extends Fragment implements LoaderManager.LoaderC
             mLeaveEventButton.setVisibility(View.GONE);
             mGetDirectionsButton.setVisibility(View.GONE);
             mYourEventView.setVisibility(View.GONE);
+        }
+
+
+        if (updateViewFlag) {
+            Log.v("WHAT!!!", "updateView called in onCreate");
+            updateEventView();
+            updateViewFlag = false;
         }
 
         return rootView;

@@ -104,12 +104,19 @@ public class EventDetailFragment extends Fragment implements LoaderManager.Loade
         mJoinEventButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: make API call to join event, then transition to the YourEventFragment(from the MainActivity)
+
                 JoinEventTask apiCall = new JoinEventTask();
                 apiCall.execute();
 
                 // now, navigate to your event tab
                 YourEventFragment.updateViewFlag = true;
+
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("event_id_of_user", Integer.parseInt(EventContract.EventEntry.getIdFromUri(mUri)));
+                editor.commit();
+                Log.v("WHAT!!!", "Event id user just joined added to shared preferences before intent created.");
+
                 Intent intent = new Intent(getActivity(), MainActivity.class);
                 intent.putExtra("tabPosition", MainActivity.YOUR_EVENT_TAB_INDEX);
                 startActivity(intent);
@@ -212,7 +219,7 @@ public class EventDetailFragment extends Fragment implements LoaderManager.Loade
 
 
             // To join an event, you need the user id and the event id
-            //int user_id = 0; // TODO: get user id from sharedprefs
+            //int user_id = 0; //
             SharedPreferences settings = getActivity().getPreferences(0);
 
             int user_id = settings.getInt("user_id", 1);

@@ -41,8 +41,6 @@ public class MainActivity extends ActionBarActivity implements EventListFragment
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // TODO: set user_id if not already set
-        // TODO: make this better
         //SharedPreferences settings = getPreferences(0);
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         //SharedPreferences.Editor settingsEditor = settings.edit();

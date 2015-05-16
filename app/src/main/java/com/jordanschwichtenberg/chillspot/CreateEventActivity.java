@@ -64,7 +64,7 @@ public class CreateEventActivity extends ActionBarActivity {
         protected String doInBackground(Void... params) {
 
             // To join an event, you need the user id and the event id
-            //int user_id = 0; // TODO: get user id from sharedprefs
+            //int user_id = 0;
             SharedPreferences settings = MainActivity.getPreferences(0);
 
             int user_id = settings.getInt("user_id", 1);

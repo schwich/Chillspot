@@ -276,7 +276,6 @@ public class ChillspotSyncAdapter extends AbstractThreadedSyncAdapter {
         if (contentValuesVector.size() > 0) {
 
             // delete old data as this is just a cache
-            // TODO: instead of deleting all data, only update those that have changed, and delete those who have been removed
             getContext().getContentResolver().delete(EventContract.EventEntry.CONTENT_URI, null, null);
 
             ContentValues[] contentValuesArray = new ContentValues[contentValuesVector.size()];

@@ -23,13 +23,15 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.jordanschwichtenberg.chillspot.data.EventContract;
 import com.jordanschwichtenberg.chillspot.sync.ChillspotSyncAdapter;
 
 public class MapFragment extends SupportMapFragment implements LoaderManager.LoaderCallbacks<Cursor>, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnMarkerClickListener {
 
     private static final int EVENTS_LOADER = 0;
 
@@ -61,12 +63,18 @@ public class MapFragment extends SupportMapFragment implements LoaderManager.Loa
     private GoogleApiClient mGoogleApiClient;
     private Cursor mCursor = null;
     private MapView mView;
+    private CameraPosition cameraPosition;
     ViewGroup layout;
 
     @Override
     public void onConnected(Bundle bundle) {
 
         Log.d("MAP", "does onConnected get called?");
+
+        if (cameraPosition != null) {
+            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            cameraPosition = null;
+        }
 
         Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
@@ -82,9 +90,16 @@ public class MapFragment extends SupportMapFragment implements LoaderManager.Loa
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
+        mMap.setOnMarkerClickListener(this);
+
         ChillspotSyncAdapter.syncImmediately(getActivity());
 
         Log.d("MAP", String.valueOf(mMap.getUiSettings().isMyLocationButtonEnabled()));
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        return false;
     }
 
     @Override
@@ -118,6 +133,8 @@ public class MapFragment extends SupportMapFragment implements LoaderManager.Loa
         mMap = mView.getMap();
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+        mMap.setOnMarkerClickListener(this);
 
         MapsInitializer.initialize(this.getActivity());
 
@@ -162,12 +179,22 @@ public class MapFragment extends SupportMapFragment implements LoaderManager.Loa
 
     private void updateMapMarkers() {
 
-        while (mCursor.moveToNext()) {
+        /*while (mCursor.moveToNext()) {
             LatLng eventLocation = new LatLng(mCursor.getDouble(COL_EVENT_LATITUDE),
                     mCursor.getDouble(COL_EVENT_LONGITUDE));
             mMap.addMarker(new MarkerOptions()
                 .position(eventLocation)
                 .title(mCursor.getString(COL_EVENT_SUB_CATEGORY)));
+        }*/
+
+        while (mCursor.moveToNext()) {
+            LatLng eventLocation = new LatLng(mCursor.getDouble(COL_EVENT_LATITUDE),
+                    mCursor.getDouble(COL_EVENT_LONGITUDE));
+            int event_id = mCursor.getInt(COL_EVENT_ID);
+            mMap.addMarker(new MarkerOptions()
+                    .position(eventLocation)
+                    .title(mCursor.getString(COL_EVENT_SUB_CATEGORY)
+                    ));
         }
     }
 
@@ -180,6 +207,10 @@ public class MapFragment extends SupportMapFragment implements LoaderManager.Loa
     public void onResume() {
         super.onResume();
         mView.onResume();
+        if (cameraPosition != null) {
+            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            cameraPosition = null;
+        }
     }
 
     @Override
@@ -192,5 +223,8 @@ public class MapFragment extends SupportMapFragment implements LoaderManager.Loa
     public void onPause() {
         super.onPause();
         mView.onPause();
+
+        cameraPosition = mMap.getCameraPosition();
+        mMap = null;
     }
 }
