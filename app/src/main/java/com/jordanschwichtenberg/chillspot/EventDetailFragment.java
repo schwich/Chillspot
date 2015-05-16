@@ -4,14 +4,18 @@ package com.jordanschwichtenberg.chillspot;
  * Created by Jordan on 3/18/2015.
  */
 
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +23,16 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.jordanschwichtenberg.chillspot.data.EventContract;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class EventDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -90,6 +104,8 @@ public class EventDetailFragment extends Fragment implements LoaderManager.Loade
             @Override
             public void onClick(View v) {
                 // TODO: make API call to join event, then transition to the YourEventFragment(from the MainActivity)
+                JoinEventTask apiCall = new JoinEventTask();
+                apiCall.execute();
             }
         });
 
@@ -151,31 +167,48 @@ public class EventDetailFragment extends Fragment implements LoaderManager.Loade
 
     }
 
-    /*public class FetchEventDetailTask extends AsyncTask<Void, Void, String> {
+    /**
+     * This will send a POST request to the server that joins the user to the particular event
+     */
+    public class JoinEventTask extends AsyncTask<Void, Void, String> {
 
-        final String CHILLSPOT_EVENT_ADDRESS = "address";
-        final String CHILLSPOT_EVENT_LATITUDE = "latitude";
-        final String CHILLSPOT_EVENT_LONGITUDE = "longitude";
-        final String CHILLSPOT_EVENT_STARTED_AT = "event_started";
-        private final String LOG_TAG = FetchEventDetailTask.class.getSimpleName();
+        final String CHILLSPOT_STATUS_CODE = "status";
+        private final String LOG_TAG = JoinEventTask.class.getSimpleName();
 
-        private String getEventDataFromJSON(String jsonStr) throws JSONException {
+        private String getReturnedJSON(String jsonStr) throws JSONException {
 
-            JSONObject eventJsonData = new JSONObject(jsonStr);
+            JSONObject data = new JSONObject(jsonStr);
 
-            String address = eventJsonData.getString(CHILLSPOT_EVENT_ADDRESS);
-            String latitude = eventJsonData.getString(CHILLSPOT_EVENT_LATITUDE);
-            String longitude = eventJsonData.getString(CHILLSPOT_EVENT_LONGITUDE);
-            String event_started_at = eventJsonData.getString(CHILLSPOT_EVENT_STARTED_AT);
+            String statusCode = data.getString(CHILLSPOT_STATUS_CODE);
 
-            String resultStr = "Address:\n\t" + address + "\n\nLatitude:\n\t" + latitude
-                    + "\n\nLongitude:\n\t" + longitude + "\n\nEvent started at:\n\t" + event_started_at;
+            String resultStr = "Status:\t" + statusCode;
+
+
+
+            if (statusCode.equals("201")) {
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("event_id_of_user", Integer.parseInt(EventContract.EventEntry.getIdFromUri(mUri)));
+                editor.commit();
+                Log.v(LOG_TAG, "Event id user just joined added to shared preferences.");
+            }
 
             return resultStr;
         }
 
         @Override
         protected String doInBackground(Void... params) {
+
+
+
+            // To join an event, you need the user id and the event id
+            //int user_id = 0; // TODO: get user id from sharedprefs
+            SharedPreferences settings = getActivity().getPreferences(0);
+
+            int user_id = settings.getInt("user_id", 1);
+            int event_id = Integer.parseInt(EventContract.EventEntry.getIdFromUri(mUri));
+
+
 
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
@@ -184,18 +217,19 @@ public class EventDetailFragment extends Fragment implements LoaderManager.Loade
             URL url = null;
 
             // Will contain the raw JSON response as a string.
-            String eventDetailJsonStr = null;
+            String returnedJSON = null;
 
             // create connection to chillspot api, and open the connection
             try {
 
                 // I don't know why, but it doesn't work unless .json is at the end
                 // TODO: FIGURE OUT WHY THE FUCK THIS WON'T WORK WITHOUT .json AT END!!!
-                url = new URL("http://evening-harbor-2864.herokuapp.com/events/" + mEventID + ".json");
+                url = new URL("http://evening-harbor-2864.herokuapp.com/events/" + event_id + "/users/" + user_id);
+
+                Log.v("API", "url for join event: " + url);
 
                 urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-
+                urlConnection.setRequestMethod("POST");
                 urlConnection.connect();
 
                 // read input stream into a String
@@ -221,7 +255,7 @@ public class EventDetailFragment extends Fragment implements LoaderManager.Loade
                     return null;
                 }
 
-                eventDetailJsonStr = buffer.toString();
+                returnedJSON = buffer.toString();
 
             } catch (IOException e) {
                 Log.e(LOG_TAG, "ERROR: ", e);
@@ -244,7 +278,7 @@ public class EventDetailFragment extends Fragment implements LoaderManager.Loade
             String parsedJSON = null;
 
             try {
-                parsedJSON = getEventDataFromJSON(eventDetailJsonStr);
+                parsedJSON = getReturnedJSON(returnedJSON);
             } catch (JSONException e) {
                 Log.e(LOG_TAG, "JSON ERROR!" + e.toString());
                 e.printStackTrace();
@@ -255,9 +289,7 @@ public class EventDetailFragment extends Fragment implements LoaderManager.Loade
 
         @Override
         protected void onPostExecute(String result) {
-            if (result != null) {
-                mEventDetailTextView.setText(result);
-            }
+            if (result != null) Log.v(LOG_TAG, "After request: " + result);
         }
-    }*/
+    }
 }

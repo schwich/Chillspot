@@ -8,14 +8,19 @@ import android.location.Location;
  */
 public class Utility {
 
-    private static Location mLastLocation;
+    private static Location mLastLocation = null;
 
     public Utility() {
 
     }
 
     public static Location getLastLocation() {
-        return mLastLocation;
+        if (mLastLocation != null) {
+            return mLastLocation;
+        } else {
+            return null;
+        }
+
     }
 
     public static void setLastLocation(Location lastLocation) {

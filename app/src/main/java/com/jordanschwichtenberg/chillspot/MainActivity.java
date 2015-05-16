@@ -1,8 +1,10 @@
 package com.jordanschwichtenberg.chillspot;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
@@ -16,15 +18,36 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.jordanschwichtenberg.chillspot.sync.ChillspotSyncAdapter;
 
 
-public class MainActivity extends ActionBarActivity implements ActionBar.TabListener, EventListFragment.Callback {
+public class MainActivity extends ActionBarActivity implements EventListFragment.Callback {
+    // removed implements ActionBar.TabListener
 
     AppSectionsPagerAdapter mAppSectionsPagerAdapter;
     ViewPager mViewPager;
+    SharedPreferences mSharedPreferences;
+
+    private SupportMapFragment mMapFragment;
+    private Fragment mEventListFragment;
+    private Fragment mYourEventFragment;
+
+    private final int MAP_TAB_INDEX = 0;
+    private final int EVENT_LIST_TAB_INDEX = 1;
+    private final int YOUR_EVENT_TAB_INDEX = 2;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // TODO: set user_id if not already set
+        // TODO: make this better
+        //SharedPreferences settings = getPreferences(0);
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        //SharedPreferences.Editor settingsEditor = settings.edit();
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putInt("user_id", 1);
+        editor.commit();
+
 
         mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(getSupportFragmentManager());
 
@@ -34,7 +57,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        mViewPager = (ViewPager) findViewById(R.id.pager);
+        /*mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mAppSectionsPagerAdapter);
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -47,7 +70,103 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             actionBar.addTab(actionBar.newTab()
                     .setText(mAppSectionsPagerAdapter.getPageTitle(i))
                     .setTabListener(this));
-        }
+        }*/
+
+        /**
+         * Map Tab
+         */
+        ActionBar.Tab tab = actionBar.newTab()
+                .setText("Nearby")
+                .setTabListener(new ActionBar.TabListener() {
+                    @Override
+                    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+                        if (mMapFragment == null) {
+                            mMapFragment = new MapFragment();
+                            fragmentTransaction.add(R.id.container, mMapFragment, "your_map");
+                        } else {
+                            fragmentTransaction.attach(mMapFragment);
+                        }
+                    }
+
+                    @Override
+                    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
+                        if (mMapFragment != null) {
+                            fragmentTransaction.detach(mMapFragment);
+                        }
+                    }
+
+                    @Override
+                    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
+                    }
+                });
+
+        actionBar.addTab(tab);
+
+        /**
+         * Event List Tab
+         */
+        tab = actionBar.newTab()
+                .setText("Browse")
+                .setTabListener(new ActionBar.TabListener() {
+                    @Override
+                    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+                        if (mEventListFragment == null) {
+                            mEventListFragment = new EventListFragment();
+                            fragmentTransaction.add(R.id.container, mEventListFragment, "event_list");
+                        } else {
+                            fragmentTransaction.attach(mEventListFragment);
+                        }
+                    }
+
+                    @Override
+                    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
+                        if (mEventListFragment != null) {
+                            fragmentTransaction.detach(mEventListFragment);
+                        }
+                    }
+
+                    @Override
+                    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
+                    }
+                });
+
+        actionBar.addTab(tab);
+
+        /**
+         * Your Event Tab
+         */
+        tab = actionBar.newTab()
+                .setText("Your Event")
+                .setTabListener(new ActionBar.TabListener() {
+                    @Override
+                    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+                        if (mYourEventFragment == null) {
+                            mYourEventFragment = new YourEventFragment();
+                            fragmentTransaction.add(R.id.container, mYourEventFragment, "your_event");
+                        } else {
+                            fragmentTransaction.attach(mYourEventFragment);
+                        }
+                    }
+
+                    @Override
+                    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
+                        if (mYourEventFragment != null) {
+                            fragmentTransaction.detach(mYourEventFragment);
+                        }
+                    }
+
+                    @Override
+                    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
+                    }
+                });
+
+        actionBar.addTab(tab);
 
         ChillspotSyncAdapter.initializeSyncAdapter(this);
     }
@@ -59,7 +178,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         startActivity(intent);
     }
 
-    @Override
+    /*@Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
         mViewPager.setCurrentItem(tab.getPosition());
     }
@@ -72,7 +191,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
 
-    }
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
