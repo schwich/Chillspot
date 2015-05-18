@@ -1,12 +1,12 @@
 package com.jordanschwichtenberg.chillspot;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -212,7 +212,8 @@ public class YourEventFragment extends Fragment implements LoaderManager.LoaderC
             }
         });
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        //SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences sharedPreferences = getActivity().getApplicationContext().getSharedPreferences("user_settings", Context.MODE_PRIVATE);
         mIdOfUserEvent = sharedPreferences.getInt("event_id_of_user", -1);
         Log.v("YourEventFragment", "in onCreateView--- Event id of user: " + String.valueOf(mIdOfUserEvent));
 
@@ -304,7 +305,8 @@ public class YourEventFragment extends Fragment implements LoaderManager.LoaderC
 
             String resultStr = "Status:\t" + statusCode;
 
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            //SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            SharedPreferences sharedPreferences = getActivity().getApplicationContext().getSharedPreferences("user_settings", Context.MODE_PRIVATE);
             sharedPreferences.edit().remove("event_id_of_user").commit();
 
             return resultStr;

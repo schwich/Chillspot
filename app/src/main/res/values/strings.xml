@@ -12,7 +12,7 @@
     <string name="sync_account_type">com.jordanschwichtenberg.chillspot</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_create_event">CreateEventActivity</string>
+    <string name="title_activity_create_event">Create an Event</string>
 
     <string name="format_distance">Distance: %2$d miles</string>
 </resources>

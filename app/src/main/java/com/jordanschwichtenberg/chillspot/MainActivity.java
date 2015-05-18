@@ -1,10 +1,10 @@
 package com.jordanschwichtenberg.chillspot;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
@@ -42,7 +42,8 @@ public class MainActivity extends ActionBarActivity implements EventListFragment
         setContentView(R.layout.activity_main);
 
         //SharedPreferences settings = getPreferences(0);
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        //mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mSharedPreferences = getApplicationContext().getSharedPreferences("user_settings", Context.MODE_PRIVATE);
         //SharedPreferences.Editor settingsEditor = settings.edit();
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putInt("user_id", 1);

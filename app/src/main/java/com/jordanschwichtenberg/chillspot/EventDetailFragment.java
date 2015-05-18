@@ -4,13 +4,13 @@ package com.jordanschwichtenberg.chillspot;
  * Created by Jordan on 3/18/2015.
  */
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -111,11 +111,12 @@ public class EventDetailFragment extends Fragment implements LoaderManager.Loade
                 // now, navigate to your event tab
                 YourEventFragment.updateViewFlag = true;
 
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                //SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                SharedPreferences sharedPreferences = getActivity().getApplicationContext().getSharedPreferences("user_settings", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putInt("event_id_of_user", Integer.parseInt(EventContract.EventEntry.getIdFromUri(mUri)));
                 editor.commit();
-                Log.v("WHAT!!!", "Event id user just joined added to shared preferences before intent created.");
+                Log.v("WHAT!!!", "Event id user just joined; added to shared preferences before intent created.");
 
                 Intent intent = new Intent(getActivity(), MainActivity.class);
                 intent.putExtra("tabPosition", MainActivity.YOUR_EVENT_TAB_INDEX);
@@ -202,13 +203,13 @@ public class EventDetailFragment extends Fragment implements LoaderManager.Loade
 
 
 
-            if (statusCode.equals("201")) {
+            /*if (statusCode.equals("201")) {
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putInt("event_id_of_user", Integer.parseInt(EventContract.EventEntry.getIdFromUri(mUri)));
                 editor.commit();
                 Log.v(LOG_TAG, "Event id user just joined added to shared preferences.");
-            }
+            }*/
 
             return resultStr;
         }
